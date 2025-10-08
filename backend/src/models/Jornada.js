@@ -13,7 +13,8 @@ const Jornada = sequelize.define('Jornadas', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
 }, {
   tableName: 'Jornadas',

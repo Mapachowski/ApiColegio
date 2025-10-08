@@ -29,7 +29,8 @@ const Alumno = sequelize.define('Alumnos', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, 
+    allowNull: false,
   },
   CreadoPor: DataTypes.INTEGER,
   FechaCreado: DataTypes.DATE,

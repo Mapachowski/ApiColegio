@@ -27,7 +27,8 @@ const Usuario = sequelize.define('Usuarios', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
   CreadoPor: DataTypes.INTEGER,
   FechaCreado: DataTypes.DATE,

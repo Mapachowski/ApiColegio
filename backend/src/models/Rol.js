@@ -13,7 +13,8 @@ const Rol = sequelize.define('Roles', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
 }, {
   tableName: 'Roles',

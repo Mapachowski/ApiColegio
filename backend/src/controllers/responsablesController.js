@@ -1,48 +1,49 @@
-const Alumno = require('../models/Alumno'); // Importa el modelo de Alumno
+const Responsable = require('../models/Responsable'); // Importa el modelo de Responsable
+const Familia = require('../models/Familia'); // Importa el modelo de Familia
 
-// Obtener todos los alumnos con estado activo
+// Obtener todos los responsables
 exports.getAll = async (req, res) => {
   try {
-    const alumnos = await Alumno.findAll({ where: { Estado: true } }); // Solo activos
-    res.json({ success: true, data: alumnos });
+    const responsables = await Responsable.findAll({ where: { Activo: 1 }, include: [Familia] }); // Solo activos, con familias
+    res.json({ success: true, data: responsables });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Obtener un alumno por ID
+// Obtener un responsable por ID
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const alumno = await Alumno.findByPk(id); // findByPk busca por clave primaria
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const responsable = await Responsable.findByPk(id, { include: [Familia] });
+    if (!responsable) {
+      return res.status(404).json({ success: false, error: 'Responsable no encontrado' });
     }
-    res.json({ success: true, data: alumno });
+    res.json({ success: true, data: responsable });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Crear un nuevo alumno
+// Crear un nuevo responsable
 exports.create = async (req, res) => {
   try {
     const { IdUsuario } = req.body; // Obtener IdUsuario del body
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const nuevoAlumno = await Alumno.create({
-      ...req.body, // Copia los datos del body
+    const nuevoResponsable = await Responsable.create({
+      ...req.body, // Copia los datos del body, incluyendo EsResponsable
       CreadoPor: IdUsuario, // Usar el IdUsuario del body
-      FechaCreado: new Date(), // Fecha actual
+      FechaCreado: new Date(), // Fecha actual (10:26 PM CST, 07/10/2025)
     });
-    res.status(201).json({ success: true, data: nuevoAlumno });
+    res.status(201).json({ success: true, data: nuevoResponsable });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 };
 
-// Actualizar un alumno
+// Actualizar un responsable
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,22 +51,22 @@ exports.update = async (req, res) => {
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const alumno = await Alumno.findByPk(id);
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const responsable = await Responsable.findByPk(id);
+    if (!responsable) {
+      return res.status(404).json({ success: false, error: 'Responsable no encontrado' });
     }
-    await alumno.update({
-      ...req.body, // Copia los datos del body
+    await responsable.update({
+      ...req.body, // Copia los datos del body, incluyendo EsResponsable
       ModificadoPor: IdUsuario, // Usar el IdUsuario del body
       FechaModificado: new Date(), // Fecha actual
     });
-    res.json({ success: true, data: alumno });
+    res.json({ success: true, data: responsable });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 };
 
-// "Eliminar" un alumno (cambiar Estado a 0)
+// "Eliminar" un responsable (cambiar Activo a 0)
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,16 +74,16 @@ exports.delete = async (req, res) => {
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const alumno = await Alumno.findByPk(id);
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const responsable = await Responsable.findByPk(id);
+    if (!responsable) {
+      return res.status(404).json({ success: false, error: 'Responsable no encontrado' });
     }
-    await alumno.update({
-      Estado: false,
+    await responsable.update({
+      Activo: 0,
       ModificadoPor: IdUsuario, // Usar el IdUsuario del body
       FechaModificado: new Date(), // Fecha actual
     });
-    res.json({ success: true, message: 'Alumno marcado como inactivo' });
+    res.json({ success: true, message: 'Responsable marcado como inactivo' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
