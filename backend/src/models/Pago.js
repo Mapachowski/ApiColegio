@@ -42,7 +42,8 @@ const Pago = sequelize.define('Pagos', {
   Monto: DataTypes.DECIMAL(10, 2),
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
   CreadoPor: DataTypes.INTEGER,
   FechaCreado: DataTypes.DATE,

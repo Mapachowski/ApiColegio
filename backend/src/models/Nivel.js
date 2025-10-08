@@ -13,7 +13,8 @@ const Nivel = sequelize.define('Niveles', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
 }, {
   tableName: 'Niveles',

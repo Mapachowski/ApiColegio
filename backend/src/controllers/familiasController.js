@@ -1,48 +1,48 @@
-const Alumno = require('../models/Alumno'); // Importa el modelo de Alumno
+const Familia = require('../models/Familia'); // Importa el modelo de Familia
 
-// Obtener todos los alumnos con estado activo
+// Obtener todas las familias
 exports.getAll = async (req, res) => {
   try {
-    const alumnos = await Alumno.findAll({ where: { Estado: true } }); // Solo activos
-    res.json({ success: true, data: alumnos });
+    const familias = await Familia.findAll({ where: { Estado: true } }); // Solo activos
+    res.json({ success: true, data: familias });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Obtener un alumno por ID
+// Obtener una familia por ID
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const alumno = await Alumno.findByPk(id); // findByPk busca por clave primaria
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const familia = await Familia.findByPk(id);
+    if (!familia) {
+      return res.status(404).json({ success: false, error: 'Familia no encontrada' });
     }
-    res.json({ success: true, data: alumno });
+    res.json({ success: true, data: familia });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// Crear un nuevo alumno
+// Crear una nueva familia
 exports.create = async (req, res) => {
   try {
     const { IdUsuario } = req.body; // Obtener IdUsuario del body
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const nuevoAlumno = await Alumno.create({
+    const nuevaFamilia = await Familia.create({
       ...req.body, // Copia los datos del body
       CreadoPor: IdUsuario, // Usar el IdUsuario del body
-      FechaCreado: new Date(), // Fecha actual
+      FechaCreado: new Date(), // Fecha actual (05:14 PM CST, 07/10/2025)
     });
-    res.status(201).json({ success: true, data: nuevoAlumno });
+    res.status(201).json({ success: true, data: nuevaFamilia });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 };
 
-// Actualizar un alumno
+// Actualizar una familia
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,22 +50,22 @@ exports.update = async (req, res) => {
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const alumno = await Alumno.findByPk(id);
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const familia = await Familia.findByPk(id);
+    if (!familia) {
+      return res.status(404).json({ success: false, error: 'Familia no encontrada' });
     }
-    await alumno.update({
+    await familia.update({
       ...req.body, // Copia los datos del body
       ModificadoPor: IdUsuario, // Usar el IdUsuario del body
       FechaModificado: new Date(), // Fecha actual
     });
-    res.json({ success: true, data: alumno });
+    res.json({ success: true, data: familia });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 };
 
-// "Eliminar" un alumno (cambiar Estado a 0)
+// "Eliminar" una familia (cambiar Estado a 0)
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,16 +73,16 @@ exports.delete = async (req, res) => {
     if (!IdUsuario || isNaN(IdUsuario)) {
       return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
     }
-    const alumno = await Alumno.findByPk(id);
-    if (!alumno) {
-      return res.status(404).json({ success: false, error: 'Alumno no encontrado' });
+    const familia = await Familia.findByPk(id);
+    if (!familia) {
+      return res.status(404).json({ success: false, error: 'Familia no encontrada' });
     }
-    await alumno.update({
+    await familia.update({
       Estado: false,
       ModificadoPor: IdUsuario, // Usar el IdUsuario del body
       FechaModificado: new Date(), // Fecha actual
     });
-    res.json({ success: true, message: 'Alumno marcado como inactivo' });
+    res.json({ success: true, message: 'Familia marcada como inactiva' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

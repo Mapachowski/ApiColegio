@@ -40,7 +40,8 @@ const Inscripcion = sequelize.define('Inscripciones', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
   ComentarioEstado: DataTypes.TEXT,
   CreadoPor: DataTypes.INTEGER,

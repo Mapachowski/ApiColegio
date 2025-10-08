@@ -13,7 +13,8 @@ const MetodoPago = sequelize.define('MetodosPago', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
 }, {
   tableName: 'MetodosPago',

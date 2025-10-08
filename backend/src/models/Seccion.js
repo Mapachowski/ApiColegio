@@ -13,7 +13,8 @@ const Seccion = sequelize.define('Secciones', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
 }, {
   tableName: 'Secciones',

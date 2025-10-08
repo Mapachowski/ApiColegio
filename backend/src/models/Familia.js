@@ -23,7 +23,8 @@ const Familia = sequelize.define('Familias', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true, // Activo por defecto
+    allowNull: false,
   },
   CreadoPor: DataTypes.INTEGER,
   FechaCreado: DataTypes.DATE,
