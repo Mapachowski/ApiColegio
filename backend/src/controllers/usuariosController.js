@@ -28,13 +28,13 @@ exports.getById = async (req, res) => {
 // Crear un nuevo usuario
 exports.create = async (req, res) => {
   try {
-    const { CreadoPor } = req.body; // Obtener CreadoPor del body
-    if (!CreadoPor || isNaN(CreadoPor)) {
-      return res.status(400).json({ success: false, error: 'CreadoPor es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const nuevoUsuario = await Usuario.create({
       ...req.body, // Copia los datos del body
-      CreadoPor: CreadoPor, // Usar el CreadoPor del body
+      IdColaborador: IdColaborador, // Usar el IdColaborador del body
       FechaCreado: new Date(), // Fecha actual (05:54 PM CST, 07/10/2025)
     });
     res.status(201).json({ success: true, data: nuevoUsuario });
@@ -47,17 +47,17 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { CreadoPor } = req.body; // Obtener CreadoPor del body
-    if (!CreadoPor || isNaN(CreadoPor)) {
-      return res.status(400).json({ success: false, error: 'CreadoPor es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const usuario = await Usuario.findByPk(id);
     if (!usuario) {
-      return res.status(404).json({ success: false, error: 'CreadoPor no encontrado' });
+      return res.status(404).json({ success: false, error: 'IdColaborador no encontrado' });
     }
     await usuario.update({
       ...req.body, // Copia los datos del body
-      ModificadoPor: CreadoPor, // Usar el CreadoPor del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, data: usuario });
@@ -70,9 +70,9 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const { CreadoPor } = req.body; // Obtener CreadoPor del body
-    if (!CreadoPor || isNaN(CreadoPor)) {
-      return res.status(400).json({ success: false, error: 'CreadoPor es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const usuario = await Usuario.findByPk(id);
     if (!usuario) {
@@ -80,7 +80,7 @@ exports.delete = async (req, res) => {
     }
     await usuario.update({
       Estado: false,
-      ModificadoPor: CreadoPor, // Usar el CreadoPor del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, message: 'Usuario marcado como inactivo' });

@@ -28,13 +28,13 @@ exports.getById = async (req, res) => {
 // Crear un nuevo responsable
 exports.create = async (req, res) => {
   try {
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const nuevoResponsable = await Responsable.create({
       ...req.body, // Copia los datos del body, incluyendo EsResponsable
-      CreadoPor: IdUsuario, // Usar el IdUsuario del body
+      CreadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaCreado: new Date(), // Fecha actual (10:26 PM CST, 07/10/2025)
     });
     res.status(201).json({ success: true, data: nuevoResponsable });
@@ -47,9 +47,9 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const responsable = await Responsable.findByPk(id);
     if (!responsable) {
@@ -57,7 +57,7 @@ exports.update = async (req, res) => {
     }
     await responsable.update({
       ...req.body, // Copia los datos del body, incluyendo EsResponsable
-      ModificadoPor: IdUsuario, // Usar el IdUsuario del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, data: responsable });
@@ -70,9 +70,9 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const responsable = await Responsable.findByPk(id);
     if (!responsable) {
@@ -80,7 +80,7 @@ exports.delete = async (req, res) => {
     }
     await responsable.update({
       Activo: 0,
-      ModificadoPor: IdUsuario, // Usar el IdUsuario del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, message: 'Responsable marcado como inactivo' });
