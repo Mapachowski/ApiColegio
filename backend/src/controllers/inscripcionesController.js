@@ -27,13 +27,13 @@ exports.getById = async (req, res) => {
 // Crear una nueva inscripción
 exports.create = async (req, res) => {
   try {
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const nuevaInscripcion = await Inscripcion.create({
       ...req.body, // Copia los datos del body
-      CreadoPor: IdUsuario, // Usar el IdUsuario del body
+      CreadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaCreado: new Date(), 
     });
     res.status(201).json({ success: true, data: nuevaInscripcion });
@@ -46,9 +46,9 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const inscripcion = await Inscripcion.findByPk(id);
     if (!inscripcion) {
@@ -56,7 +56,7 @@ exports.update = async (req, res) => {
     }
     await inscripcion.update({
       ...req.body, // Copia los datos del body
-      ModificadoPor: IdUsuario, // Usar el IdUsuario del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, data: inscripcion });
@@ -69,9 +69,9 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
-    const { IdUsuario } = req.body; // Obtener IdUsuario del body
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    const { IdColaborador } = req.body; // Obtener IdColaborador del body
+    if (!IdColaborador || isNaN(IdColaborador)) {
+      return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
     const inscripcion = await Inscripcion.findByPk(id);
     if (!inscripcion) {
@@ -79,7 +79,7 @@ exports.delete = async (req, res) => {
     }
     await inscripcion.update({
       Estado: false,
-      ModificadoPor: IdUsuario, // Usar el IdUsuario del body
+      ModificadoPor: IdColaborador, // Usar el IdColaborador del body
       FechaModificado: new Date(), // Fecha actual
     });
     res.json({ success: true, message: 'Inscripción marcada como inactiva' });
