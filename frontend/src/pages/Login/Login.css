@@ -1,0 +1,88 @@
+.login-container {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: #001f3f; /* Azul oscuro */
+}
+
+.login-box {
+  display: flex;
+  width: 900px;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.login-form {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form h2 {
+  margin-bottom: 30px; /* Más espacio debajo del título */
+  color: #e60000; /* Rojo */
+  font-size: 28px; /* Título más grande */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px; /* Más espacio entre campos */
+}
+
+.input-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333; /* Texto más oscuro para contraste */
+}
+
+.input-group input {
+  padding: 12px; /* Padding un poco más grande */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px; /* Texto más legible */
+}
+
+button {
+  background-color: #e60000;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px; /* Texto del botón más grande */
+  margin-top: 10px; /* Espacio arriba del botón */
+}
+
+button:hover {
+  background-color: #b00000;
+}
+
+.signup-text {
+  margin-top: 20px; /* Más espacio arriba del enlace */
+  font-size: 14px;
+  color: #555; /* Color más suave */
+}
+
+.signup-text a {
+  color: #001f3f;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+.carousel-section {
+  flex: 1.2;
+  position: relative;
+  background-color: #001f3f; /* Fondo azul oscuro como placeholder */
+}
