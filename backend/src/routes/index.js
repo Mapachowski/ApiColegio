@@ -15,6 +15,7 @@ const nivelesRoutes = require('./nivelesRoutes');
 const rolesRoutes = require('./rolesRoutes');
 const seccionesRoutes = require('./seccionesRoutes');
 const tipoPagosRoutes = require('./tipoPagosRoutes');
+const loginRoutes = require('./loginRoutes');
 
 router.use('/alumnos', alumnosRoutes);
 router.use('/grados', gradosRoutes);
@@ -30,5 +31,6 @@ router.use('/niveles', nivelesRoutes);
 router.use('/roles', rolesRoutes);
 router.use('/secciones', seccionesRoutes);
 router.use('/tipopagos', tipoPagosRoutes);
+router.post('/login', loginRoutes);
 
 module.exports = router;
