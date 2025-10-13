@@ -20,8 +20,14 @@ const Alumno = sequelize.define('Alumnos', {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  FechaNacimiento: DataTypes.DATE,
-  Genero: DataTypes.STRING(50),
+  FechaNacimiento: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  Genero: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
   IdFamilia: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -29,13 +35,37 @@ const Alumno = sequelize.define('Alumnos', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true, 
+    defaultValue: true,
     allowNull: false,
   },
-  CreadoPor: DataTypes.INTEGER,
-  FechaCreado: DataTypes.DATE,
-  ModificadoPor: DataTypes.INTEGER,
-  FechaModificado: DataTypes.DATE,
+  CreadoPor: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  FechaCreado: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  ModificadoPor: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  FechaModificado: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  ContactoEmergencia: {
+    type: DataTypes.STRING(60),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
+  NumeroEmergencia: {
+    type: DataTypes.STRING(12),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
+  ComunidadLinguistica: {
+    type: DataTypes.STRING(4),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
 }, {
   tableName: 'Alumnos',
   timestamps: false,
