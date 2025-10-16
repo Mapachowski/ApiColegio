@@ -13,22 +13,25 @@ const Login = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     const trimmedNombreUsuario = NombreUsuario.trim();
     if (!trimmedNombreUsuario || !Contrasena) {
       setError('Por favor, completa todos los campos.');
       setIsLoading(false);
       return;
     }
-
     try {
       const response = await apiClient.post('/login', {
         NombreUsuario: trimmedNombreUsuario,
         Contrasena,
       });
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        onLoginSuccess(response.data.usuario);
+        const { token, usuario } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({
+          IdUsuario: usuario.id, // Usamos usuario.id como IdUsuario
+          rol: usuario.rol,     // Usamos usuario.rol como rol
+        }));
+        onLoginSuccess({ IdUsuario: usuario.id, rol: usuario.rol }); // Pasa los datos al padre
       }
     } catch (err) {
       if (err.response) {
@@ -82,7 +85,6 @@ const Login = ({ onLoginSuccess }) => {
               </p>
             )}
           </form>
-          
         </div>
         <div className="carousel-section">
           <Carousel />
