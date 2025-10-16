@@ -82,7 +82,7 @@ const Sidebar = ({ user }) => {
       icon: <UserOutlined />,
       label: 'Estudiantes',
       children: [
-        { key: '2-1', label: 'Inscribir Estudiante', path: '/inscribir-estudiante', icon: <UserAddOutlined /> },
+        { key: '2-1', label: 'Inscribir Estudiante', path: '/dashboard/inscribir-estudiante', icon: <UserAddOutlined /> },
         { key: '2-2', label: 'Modificar Estudiante', path: '/modificar-estudiante', icon: <EditOutlined /> },
         { key: '2-3', label: 'Admisiones', path: '/admisiones', icon: <SolutionOutlined /> },
         { key: '2-4', label: 'Listados Estudiantes', path: '/listados-estudiantes', icon: <UnorderedListOutlined /> },
@@ -136,7 +136,7 @@ const Sidebar = ({ user }) => {
       icon: <DollarOutlined />,
       label: 'Pagos',
       children: [
-        { key: '6-1', label: 'Ingreso de Pagos', path: '/ingreso-pagos', icon: <WalletOutlined /> },
+        { key: '6-1', label: 'Ingreso de Pagos', path: '/dashboard/pagos/crear', icon: <WalletOutlined /> },
         { key: '6-2', label: 'Buscar Recibo', path: '/buscar-recibo', icon: <SearchOutlined /> },
         { key: '6-3', label: 'Configuración de Rubros', path: '/configurar-rubros', icon: <SettingFilled /> },
         { key: '6-4', label: 'Mora y Recargo', path: '/mora-recargo', icon: <ExclamationCircleOutlined /> },
@@ -174,19 +174,22 @@ const Sidebar = ({ user }) => {
   });
 
   // Personalizar ítems del menú con íconos solo en la etiqueta
-  const customizedMenuItems = menuItems.map((item) => ({
-    ...item,
-    label: <Link to={item.path || '#'}>{item.label}</Link>,
-    children: item.children?.map((child) => ({
+ const customizedMenuItems = menuItems.map((item) => ({
+  ...item,
+  label: <Link to={item.path || '#'}>{item.label}</Link>,
+  children: item.children?.map((child) => {
+    //console.log('Navigating to:', child.path); // Depuración
+    return {
       key: child.key,
       label: (
-        <span>
+        <Link to={child.path}>
           {child.icon} {child.label}
-        </span>
+        </Link>
       ),
-      icon: null, // Evita duplicación eliminando el ícono del objeto
-    })),
-  }));
+      icon: null, // Evita duplicación de íconos
+    };
+  }),
+}));
 
   return (
     <Sider width={250} style={{ background: '#001f3f', height: '100vh', position: 'fixed', color: '#fff' }}>
