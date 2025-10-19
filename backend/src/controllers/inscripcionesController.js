@@ -81,6 +81,37 @@ exports.getByFilters = async (req, res) => {
   }
 };
 
+// Obtener inscripción por IdAlumno y CicloEscolar usando stored procedure
+exports.getByAlumnoAndCiclo = async (req, res) => {
+  try {
+    const { IdAlumno, CicloEscolar } = req.query;
+
+    // Validar parámetros
+    const alumnoId = IdAlumno ? parseInt(IdAlumno, 10) : null;
+    if (!IdAlumno || isNaN(alumnoId)) {
+      return res.status(400).json({ success: false, error: 'IdAlumno es requerido y debe ser un número' });
+    }
+    if (!CicloEscolar || !/^\d{4}$/.test(CicloEscolar)) {
+      return res.status(400).json({ success: false, error: 'CicloEscolar es requerido y debe ser un año en formato YYYY' });
+    }
+
+    // Escapar CicloEscolar para evitar inyección SQL
+    const escapedCicloEscolar = sequelize.escape(CicloEscolar);
+    const query = `CALL sp_BuscarAlumnoPorIdEnInscripcion(${alumnoId}, ${escapedCicloEscolar})`;
+    const results = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+
+    const inscripciones = results;
+
+    if (!inscripciones || inscripciones.length === 0) {
+      return res.status(404).json({ success: false, error: 'No se encontró la inscripción para el alumno y ciclo escolar proporcionados' });
+    }
+
+    res.json({ success: true, data: inscripciones });
+  } catch (error) {
+    console.error('Error en getByAlumnoAndCiclo:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 // Crear una nueva inscripción
 exports.create = async (req, res) => {
   try {
