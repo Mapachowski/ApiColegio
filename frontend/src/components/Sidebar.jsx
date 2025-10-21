@@ -82,7 +82,7 @@ const Sidebar = ({ user }) => {
       icon: <UserOutlined />,
       label: 'Estudiantes',
       children: [
-        { key: '2-1', label: 'Inscribir Estudiante', path: '/dashboard/inscribir-estudiante', icon: <UserAddOutlined /> },
+        { key: '2-1', label: 'Inscribir Estudiante', path: '/dashboard/inscripciones/inscripciones', icon: <UserAddOutlined /> },
         { key: '2-2', label: 'Modificar Estudiante', path: '/modificar-estudiante', icon: <EditOutlined /> },
         { key: '2-3', label: 'Admisiones', path: '/admisiones', icon: <SolutionOutlined /> },
         { key: '2-4', label: 'Listados Estudiantes', path: '/listados-estudiantes', icon: <UnorderedListOutlined /> },

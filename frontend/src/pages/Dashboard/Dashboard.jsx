@@ -5,7 +5,7 @@ import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import Home from '../../components/Home';
 import Preferencias from './Preferencias';
-import InscribirEstudiante from './InscribirEstudiante';
+import Inscripciones from './Inscripciones/Inscripciones';
 import CrearPago from './Pagos/CrearPagos';
 import './Dashboard.css';
 
@@ -23,7 +23,7 @@ const Dashboard = ({ user }) => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/preferencias" element={<Preferencias />} />
-            <Route path="/inscribir-estudiante" element={<InscribirEstudiante />} />
+            <Route path="/inscripciones/inscripciones" element={<Inscripciones />} />
             <Route path="/pagos/crear" element={<CrearPago />} />
             {/* Agrega más rutas */}
           </Routes>
