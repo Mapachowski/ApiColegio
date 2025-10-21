@@ -32,6 +32,10 @@ const Alumno = sequelize.define('Alumnos', {
     defaultValue: true, 
     allowNull: false,
   },
+  ComunidadLinguistica: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   CreadoPor: DataTypes.INTEGER,
   FechaCreado: DataTypes.DATE,
   ModificadoPor: DataTypes.INTEGER,

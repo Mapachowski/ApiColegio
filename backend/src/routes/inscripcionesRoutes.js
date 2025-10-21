@@ -1,12 +1,14 @@
 const express = require('express');
-const router = express.Router();
-const inscripcionesController = require('../controllers/inscripcionesController'); // Importa el controlador
+   const router = express.Router();
+   const inscripcionController = require('../controllers/inscripcionesController');
 
-// Rutas para inscripciones
-router.get('/', inscripcionesController.getAll);          // GET /api/inscripciones
-router.get('/:id', inscripcionesController.getById);      // GET /api/inscripciones/:id
-router.post('/', inscripcionesController.create);         // POST /api/inscripciones
-router.put('/:id', inscripcionesController.update);       // PUT /api/inscripciones/:id
-router.delete('/:id', inscripcionesController.delete);    // DELETE /api/inscripciones/:id
+   // Rutas para inscripciones
+   router.get('/', inscripcionController.getAll); // Todas las inscripciones
+   router.get('/filtros', inscripcionController.getByFilters); // Filtrar por Grado, Seccion, Jornada
+   router.get('/buscar-alumno', inscripcionController.getByAlumnoAndCiclo); // Buscar por IdAlumno y CicloEscolar
+   router.get('/:id', inscripcionController.getById); // Obtener por ID
+   router.post('/', inscripcionController.create); // Crear
+   router.put('/:id', inscripcionController.update); // Actualizar
+   router.delete('/:id', inscripcionController.delete); // Eliminar (soft delete)
 
-module.exports = router;
+   module.exports = router;
