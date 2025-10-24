@@ -39,16 +39,35 @@ const Pago = sequelize.define('Pagos', {
     allowNull: false,
     references: { model: 'MetodosPago', key: 'IdMetodoPago' },
   },
-  Monto: DataTypes.DECIMAL(10, 2),
+  Monto: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true, // Activo por defecto
+    defaultValue: true,
     allowNull: false,
   },
-  CreadoPor: DataTypes.INTEGER,
-  FechaCreado: DataTypes.DATE,
-  ModificadoPor: DataTypes.INTEGER,
-  FechaModificado: DataTypes.DATE,
+  CreadoPor: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  FechaCreado: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  ModificadoPor: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  FechaModificado: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  NumeroRecibo: {
+    type: DataTypes.STRING(55),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
 }, {
   tableName: 'Pagos',
   timestamps: false,

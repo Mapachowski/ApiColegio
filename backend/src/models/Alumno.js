@@ -20,8 +20,14 @@ const Alumno = sequelize.define('Alumnos', {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  FechaNacimiento: DataTypes.DATE,
-  Genero: DataTypes.STRING(50),
+  FechaNacimiento: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  Genero: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
   IdFamilia: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -29,7 +35,7 @@ const Alumno = sequelize.define('Alumnos', {
   },
   Estado: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true, 
+    defaultValue: true,
     allowNull: false,
   },
   ComunidadLinguistica: {
