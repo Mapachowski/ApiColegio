@@ -1,4 +1,5 @@
-const Alumno = require('../models/Alumno');
+const sequelize = require('../config/database'); // ← Ahora sí funciona
+const Alumno = require('../models/Alumno'); // Importa el modelo de Alumno
 
 // Obtener todos los alumnos con estado activo
 exports.getAll = async (req, res) => {
@@ -62,7 +63,26 @@ exports.create = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
+// NUEVO: Obtener el siguiente carné
+exports.getSiguienteCarnet = async (req, res) => {
+  console.log('Ejecutando getSiguienteCarnet...');
+  try {
+    const [results] = await sequelize.query('CALL sp_SiguienteCarnet()');
+    const siguienteCarnet = results[0]?.SiguienteCarnet || results?.SiguienteCarnet;
 
+    if (!siguienteCarnet) {
+      return res.status(404).json({
+        success: false,
+        error: 'SP no devolvió SiguienteCarnet'
+      });
+    }
+
+    res.json({ success: true, data: siguienteCarnet });
+  } catch (error) {
+    console.error('Error en getSiguienteCarnet:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 // Actualizar un alumno
 exports. update = async (req, res) => {
   try {
