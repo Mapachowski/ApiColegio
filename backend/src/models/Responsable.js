@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Familia = require('./Familia'); // Importa el modelo de Familia
+const Familia = require('./Familia');
+const ResponsableTipo = require('./ResponsableTipo'); // Importamos el nuevo modelo
 
 const Responsable = sequelize.define('Responsables', {
   IdResponsable: {
@@ -25,13 +26,22 @@ const Responsable = sequelize.define('Responsables', {
     allowNull: false,
     references: { model: 'Familias', key: 'IdFamilia' },
   },
+  IdResponsableTipo: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'ResponsableTipo',
+      key: 'IdResponsableTipo'
+    },
+    comment: 'Tipo de responsable: Padre, Madre, Tutor, etc.'
+  },
   EsResponsable: {
-    type: DataTypes.BOOLEAN, // Mapea BIT a BOOLEAN en Sequelize
-    allowNull: true, // O cambia a false si quieres obligatorio
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
   },
   Activo: {
     type: DataTypes.TINYINT,
-    defaultValue: 1, // Activo por defecto (1 = true, 0 = false en MySQL)
+    defaultValue: 1,
     allowNull: false,
   },
   CreadoPor: DataTypes.INTEGER,
@@ -43,7 +53,13 @@ const Responsable = sequelize.define('Responsables', {
   timestamps: false,
 });
 
-// Relación
+// Relación con Familia (ya existente)
 Responsable.belongsTo(Familia, { foreignKey: 'IdFamilia' });
+
+// NUEVA RELACIÓN: Responsable → ResponsableTipo
+Responsable.belongsTo(ResponsableTipo, {
+  foreignKey: 'IdResponsableTipo',
+  as: 'TipoResponsable'
+});
 
 module.exports = Responsable;

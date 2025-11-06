@@ -71,32 +71,29 @@ exports.getByNumeroRecibo = async (req, res) => {
 // Crear un nuevo pago
 exports.create = async (req, res) => {
   try {
-    const { IdColaborador, Fecha, IdUsuario, IdAlumno, IdTipoPago, Concepto, IdMetodoPago, Monto, NumeroRecibo } = req.body;
+    const {
+      IdColaborador, Fecha, IdUsuario, IdAlumno, IdTipoPago, Concepto,
+      IdMetodoPago, Monto, NumeroRecibo, NombreRecibo, DireccionRecibo
+    } = req.body;
 
-    // Validar campos requeridos
+    // Validaciones existentes
     if (!IdColaborador || isNaN(IdColaborador)) {
       return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
-    if (!Fecha) {
-      return res.status(400).json({ success: false, error: 'Fecha es requerida' });
+    if (!Fecha) return res.status(400).json({ success: false, error: 'Fecha es requerida' });
+    if (!IdUsuario || isNaN(IdUsuario)) return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
+    if (!IdAlumno || isNaN(IdAlumno)) return res.status(400).json({ success: false, error: 'IdAlumno es requerido y debe ser un número' });
+    if (!IdTipoPago || isNaN(IdTipoPago)) return res.status(400).json({ success: false, error: 'IdTipoPago es requerido y debe ser un número' });
+    if (!Concepto) return res.status(400).json({ success: false, error: 'Concepto es requerido' });
+    if (!IdMetodoPago || isNaN(IdMetodoPago)) return res.status(400).json({ success: false, error: 'IdMetodoPago es requerido y debe ser un número' });
+    if (!Monto || isNaN(Monto)) return res.status(400).json({ success: false, error: 'Monto es requerido y debe ser un número' });
+
+    // NUEVAS VALIDACIONES
+    if (!NombreRecibo || typeof NombreRecibo !== 'string' || NombreRecibo.trim() === '') {
+      return res.status(400).json({ success: false, error: 'NombreRecibo es requerido y debe ser texto válido' });
     }
-    if (!IdUsuario || isNaN(IdUsuario)) {
-      return res.status(400).json({ success: false, error: 'IdUsuario es requerido y debe ser un número' });
-    }
-    if (!IdAlumno || isNaN(IdAlumno)) {
-      return res.status(400).json({ success: false, error: 'IdAlumno es requerido y debe ser un número' });
-    }
-    if (!IdTipoPago || isNaN(IdTipoPago)) {
-      return res.status(400).json({ success: false, error: 'IdTipoPago es requerido y debe ser un número' });
-    }
-    if (!Concepto) {
-      return res.status(400).json({ success: false, error: 'Concepto es requerido' });
-    }
-    if (!IdMetodoPago || isNaN(IdMetodoPago)) {
-      return res.status(400).json({ success: false, error: 'IdMetodoPago es requerido y debe ser un número' });
-    }
-    if (!Monto || isNaN(Monto)) {
-      return res.status(400).json({ success: false, error: 'Monto es requerido y debe ser un número' });
+    if (!DireccionRecibo || typeof DireccionRecibo !== 'string' || DireccionRecibo.trim() === '') {
+      return res.status(400).json({ success: false, error: 'DireccionRecibo es requerida y debe ser texto válido' });
     }
 
     const nuevoPago = await Pago.create({
@@ -108,6 +105,8 @@ exports.create = async (req, res) => {
       IdMetodoPago,
       Monto,
       NumeroRecibo,
+      NombreRecibo: NombreRecibo.trim(),
+      DireccionRecibo: DireccionRecibo.trim(),
       Estado: true,
       CreadoPor: IdColaborador,
       FechaCreado: new Date(),
@@ -115,6 +114,7 @@ exports.create = async (req, res) => {
 
     res.status(201).json({ success: true, data: nuevoPago });
   } catch (error) {
+    console.error('Error al crear pago:', error);
     res.status(400).json({ success: false, error: error.message });
   }
 };
@@ -123,9 +123,11 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { IdColaborador, Fecha, IdUsuario, IdAlumno, IdTipoPago, Concepto, IdMetodoPago, Monto, NumeroRecibo, Estado } = req.body;
+    const {
+      IdColaborador, Fecha, IdUsuario, IdAlumno, IdTipoPago, Concepto,
+      IdMetodoPago, Monto, NumeroRecibo, NombreRecibo, DireccionRecibo, Estado
+    } = req.body;
 
-    // Validar IdColaborador
     if (!IdColaborador || isNaN(IdColaborador)) {
       return res.status(400).json({ success: false, error: 'IdColaborador es requerido y debe ser un número' });
     }
@@ -144,6 +146,9 @@ exports.update = async (req, res) => {
       IdMetodoPago: IdMetodoPago || pago.IdMetodoPago,
       Monto: Monto !== undefined ? Monto : pago.Monto,
       NumeroRecibo: NumeroRecibo !== undefined ? NumeroRecibo : pago.NumeroRecibo,
+      // NUEVOS CAMPOS
+      NombreRecibo: NombreRecibo !== undefined ? NombreRecibo.trim() : pago.NombreRecibo,
+      DireccionRecibo: DireccionRecibo !== undefined ? DireccionRecibo.trim() : pago.DireccionRecibo,
       Estado: Estado !== undefined ? Estado : pago.Estado,
       ModificadoPor: IdColaborador,
       FechaModificado: new Date(),
@@ -151,10 +156,10 @@ exports.update = async (req, res) => {
 
     res.json({ success: true, data: pago });
   } catch (error) {
+    console.error('Error al actualizar pago:', error);
     res.status(400).json({ success: false, error: error.message });
   }
 };
-
 // "Eliminar" un pago (cambiar Estado a false)
 exports.delete = async (req, res) => {
   try {

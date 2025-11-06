@@ -15,8 +15,8 @@ const Familia = sequelize.define('Familias', {
   Direccion: DataTypes.STRING(255),
   TelefonoContacto: DataTypes.STRING(50),
   EmailContacto: DataTypes.STRING(255),
-  EstadoCivil: DataTypes.STRING(50),
-  Edad: DataTypes.INTEGER,
+  NombreRecibo: DataTypes.STRING(50),
+  DireccionRecibo: DataTypes.STRING(50),
   IdUsuario: {
     type: DataTypes.INTEGER,
     references: { model: 'Usuarios', key: 'IdUsuario' },

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, DatePicker, message, Modal, Table } from 'antd';
 import apiClient from '../../../api/apiClient';
-
 const { Option } = Select;
 
 const CrearPago = () => {
@@ -9,12 +8,12 @@ const CrearPago = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [metodosPago, setMetodosPago] = useState([]);
   const [tiposPago, setTiposPago] = useState([]);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false); // Usamos open en lugar de visible
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Usamos open en lugar de visible
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [selectedAlumno, setSelectedAlumno] = useState(null);
-  const [cicloEscolar, setCicloEscolar] = useState('2026'); // Ajustado a octubre 2025 como inicio del ciclo 2026
+  const [cicloEscolar, setCicloEscolar] = useState('2026');
   const [alumnoData, setAlumnoData] = useState([]);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Para forzar re-renderizado
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const user = JSON.parse(localStorage.getItem('user')) || { IdUsuario: null, rol: null };
 
   useEffect(() => {
@@ -26,52 +25,14 @@ const CrearPago = () => {
           apiClient.get('/tipopagos'),
         ]);
 
-        // Procesar cada respuesta individualmente
-        if (alumnosResponse.data) {
-          console.log('Respuesta de alumnos:', alumnosResponse.data);
-          if (Array.isArray(alumnosResponse.data)) {
-            setAlumnos(alumnosResponse.data);
-          } else if (alumnosResponse.data && Array.isArray(alumnosResponse.data.data)) {
-            setAlumnos(alumnosResponse.data.data);
-          } else {
-            setAlumnos([]);
-            message.warning('Formato de datos de alumnos inválido');
-          }
-        }
-
-        if (metodosPagoResponse.data) {
-          console.log('Respuesta de métodos de pago:', metodosPagoResponse.data);
-          if (Array.isArray(metodosPagoResponse.data)) {
-            setMetodosPago(metodosPagoResponse.data);
-          } else if (metodosPagoResponse.data && Array.isArray(metodosPagoResponse.data.data)) {
-            setMetodosPago(metodosPagoResponse.data.data);
-          } else {
-            setMetodosPago([]);
-            message.warning('Formato de datos de métodos de pago inválido');
-          }
-        }
-
-        if (tiposPagoResponse.data) {
-          console.log('Respuesta de tipos de pago:', tiposPagoResponse.data);
-          if (Array.isArray(tiposPagoResponse.data)) {
-            setTiposPago(tiposPagoResponse.data);
-          } else if (tiposPagoResponse.data && Array.isArray(tiposPagoResponse.data.data)) {
-            setTiposPago(tiposPagoResponse.data.data);
-          } else {
-            setTiposPago([]);
-            message.warning('Formato de datos de tipos de pago inválido');
-          }
-        }
+        setAlumnos(alumnosResponse.data?.data || alumnosResponse.data || []);
+        setMetodosPago(metodosPagoResponse.data?.data || metodosPagoResponse.data || []);
+        setTiposPago(tiposPagoResponse.data?.data || tiposPagoResponse.data || []);
       } catch (error) {
         console.error('Error al cargar datos iniciales:', error);
-        if (error.response?.status === 500) {
-          message.error('Error 500 al cargar datos: Verifica el backend. Algunos datos pueden no estar disponibles.');
-        } else {
-          message.error('Error al cargar datos: Revisa la conexión.');
-        }
+        message.error('Error al cargar datos: Revisa la conexión.');
       }
     };
-
     fetchData();
   }, []);
 
@@ -92,78 +53,111 @@ const CrearPago = () => {
       Monto: parseFloat(values.Monto),
       NumeroRecibo: values.NumeroRecibo || null,
       Estado: true,
+      // CAMPOS NUEVOS
+      NombreRecibo: values.NombreRecibo || null,
+      DireccionRecibo: values.DireccionRecibo || null,
     };
 
     console.log('Payload enviado:', payload);
-
     apiClient.post('/pagos', payload)
-      .then((response) => {
-        console.log('Pago exitoso, mostrando PopUp de éxito');
-        setIsSuccessModalOpen(true); // Mostramos el PopUp de éxito
+      .then(() => {
+        message.success('Pago creado con éxito');
+        setIsSuccessModalOpen(true);
         form.resetFields();
       })
       .catch((error) => {
-        console.error('Error al crear pago:', error.response ? error.response.data : error.message);
-        message.error('Error al crear el pago: ' + (error.response?.data?.message || 'Revisa los datos'));
+        console.error('Error al crear pago:', error.response?.data || error);
+        message.error('Error al crear el pago');
       });
   };
 
-  const handleSearchModalOk = () => {
-    setIsSearchModalOpen(false);
-  };
-
-  const handleSuccessModalOk = () => {
-    setIsSuccessModalOpen(false);
-  };
-
-  const handleSearchAlumno = () => {
+  const handleSearchAlumno = async () => {
     if (!selectedAlumno) {
       message.warning('Por favor selecciona un alumno.');
       return;
     }
-    apiClient.get(`/inscripciones/buscar-alumno?IdAlumno=${selectedAlumno}&CicloEscolar=${cicloEscolar}`)
-      .then((response) => {
-        console.log('Respuesta de búsqueda de alumno:', response.data);
-        if (response.data.success && response.data.data && response.data.data.length > 0) {
-          setAlumnoData(response.data.data);
+
+    try {
+      const response = await apiClient.get(
+        `/inscripciones/buscar-alumno?IdAlumno=${selectedAlumno}&CicloEscolar=${cicloEscolar}`
+      );
+
+      if (response.data.success && response.data.data?.length > 0) {
+        const data = response.data.data[0];
+        setAlumnoData(response.data.data);
+
+        // CARGAR DATOS DE FAMILIA
+        if (data.IdFamilia) {
+          try {
+            const familiaRes = await apiClient.get(`/familias/${data.IdFamilia}`);
+            const familia = familiaRes.data;
+
+            form.setFieldsValue({
+              NombreRecibo: familia.NombreRecibo || '',
+              DireccionRecibo: familia.DireccionRecibo || '',
+            });
+          } catch (err) {
+            console.warn('Familia no encontrada o sin datos:', err);
+            form.setFieldsValue({ NombreRecibo: '', DireccionRecibo: '' });
+          }
         } else {
-          setAlumnoData([]);
-          message.warning('No se encontraron datos para el alumno.');
+          form.setFieldsValue({ NombreRecibo: '', DireccionRecibo: '' });
         }
-      })
-      .catch((error) => {
-        console.error('Error al buscar alumno:', error);
-        message.error('Error al buscar alumno: ' + (error.response?.status === 404 ? 'Endpoint no encontrado. Verifica la URL.' : 'El servidor devolvió un error.'));
+      } else {
         setAlumnoData([]);
-      });
+        message.warning('No se encontraron datos para el alumno.');
+      }
+    } catch (error) {
+      console.error('Error al buscar alumno:', error);
+      message.error('Error al buscar alumno');
+      setAlumnoData([]);
+    }
   };
 
-  const handleRowDoubleClick = (record) => {
-    console.log('Doble clic en:', record); // Depuración
-    const montoValue = parseFloat(record[0].Mensualidad) || 0; // Aseguramos un número
-    console.log('Valor asignado a Monto:', montoValue); // Depuración adicional
-    form.setFieldsValue({
-      IdAlumno: record[0].IdAlumno,
-      Nombres: `${record[0].Nombres} ${record[0].Apellidos}`, // Mostrado como texto no editable
-      Monto: montoValue, // Asignamos el número
-    });
-    // Forzamos la actualización del campo Monto
-    setTimeout(() => {
-      form.setFieldsValue({ Monto: montoValue });
-      form.validateFields(['Monto']); // Validamos el campo
-      console.log('Valor de Monto en formulario:', form.getFieldValue('Monto')); // Depuración
-      setRefreshTrigger((prev) => prev + 1); // Forzar re-renderizado
-    }, 0);
-    setIsSearchModalOpen(false); // Cerramos el PopUp de búsqueda
-  };
+const handleRowDoubleClick = async (record) => {
+  const data = record[0];
+
+  console.log('DATOS DEL SP:', data);
+
+  // Llenar datos básicos
+  form.setFieldsValue({
+    IdAlumno: data.IdAlumno,
+    Nombres: `${data.Nombres} ${data.Apellidos}`,
+    Monto: parseFloat(data.Mensualidad) || 0,
+  });
+
+  // CARGAR DATOS DE RECIBO DESDE FAMILIA
+  if (data.IdFamilia) {
+    try {
+      const familiaRes = await apiClient.get(`/familias/${data.IdFamilia}`);
+      const familia = familiaRes.data.data; // ← AQUÍ ESTABA EL ERROR
+
+      console.log('DATOS DE FAMILIA (API):', familia);
+
+      form.setFieldsValue({
+        NombreRecibo: familia.NombreRecibo || familia.NombreFamilia || '',
+        DireccionRecibo: familia.DireccionRecibo || familia.Direccion || '',
+      });
+    } catch (err) {
+      console.error('Error al cargar familia:', err);
+      // Fallback
+      form.setFieldsValue({
+        NombreRecibo: data.NombreFamilia || '',
+        DireccionRecibo: data.Direccion || '',
+      });
+    }
+  }
+
+  setIsSearchModalOpen(false);
+};
 
   const columns = [
-    { title: 'Carnet', dataIndex: ['0', 'IdAlumno'], key: 'IdAlumno', width: 120 }, // Aumentamos el tamaño de Carnet
+    { title: 'Carnet', dataIndex: ['0', 'IdAlumno'], key: 'IdAlumno', width: 120 },
     { title: 'Matrícula', dataIndex: ['0', 'Matricula'], key: 'Matricula' },
     { title: 'Nombres', dataIndex: ['0', 'Nombres'], key: 'Nombres', width: 150 },
     { title: 'Apellidos', dataIndex: ['0', 'Apellidos'], key: 'Apellidos', width: 150 },
     { title: 'Grado', dataIndex: ['0', 'NombreGrado'], key: 'NombreGrado' },
-    { title: 'Mensualidad', dataIndex: ['0', 'Mensualidad'], key: 'Mensualidad' }, // Corrección de "Mensuali-dad" a "Mensualidad"
+    { title: 'Mensualidad', dataIndex: ['0', 'Mensualidad'], key: 'Mensualidad' },
     { title: 'Sección', dataIndex: ['0', 'NombreSeccion'], key: 'NombreSeccion' },
     { title: 'Jornada', dataIndex: ['0', 'NombreJornada'], key: 'NombreJornada', width: 100 },
     { title: 'Ciclo Escolar', dataIndex: ['0', 'CicloEscolar'], key: 'CicloEscolar' },
@@ -172,14 +166,12 @@ const CrearPago = () => {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: 24 }}>
       <h2>Ingresar Pago</h2>
+
       <Form form={form} name="createPago" onFinish={onFinish} layout="vertical" key={refreshTrigger}>
-        <Form.Item
-          name="Fecha"
-          label="Fecha"
-          rules={[{ required: true, message: 'Por favor selecciona la fecha' }]}
-        >
+        <Form.Item name="Fecha" label="Fecha" rules={[{ required: true, message: 'Selecciona la fecha' }]}>
           <DatePicker style={{ width: '100%' }} />
         </Form.Item>
+
         <Form.Item label="Alumno">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Input.Group compact style={{ display: 'flex', flex: 1 }}>
@@ -190,69 +182,53 @@ const CrearPago = () => {
                 <Input readOnly style={{ flex: 1, minWidth: '150px' }} placeholder="Carnet" />
               </Form.Item>
             </Input.Group>
-            <Button type="primary" onClick={() => setIsSearchModalOpen(true)} style={{ background: '#003366', borderColor: '#003366', marginLeft: '10px' }}>
+            <Button type="primary" onClick={() => setIsSearchModalOpen(true)} style={{ background: '#003366', borderColor: '#003366' }}>
               Buscar Alumno
             </Button>
           </div>
         </Form.Item>
-        <Form.Item
-          name="IdMetodoPago"
-          label="Método de Pago"
-          rules={[{ required: true, message: 'Por favor selecciona un método' }]}
-        >
-          <Select placeholder="Selecciona un método de pago">
-            {Array.isArray(metodosPago) ? (
-              metodosPago.map((metodo) => (
-                <Option key={metodo.IdMetodoPago} value={metodo.IdMetodoPago}>
-                  {metodo.NombreMetodoPago}
-                </Option>
-              ))
-            ) : (
-              <Option disabled>No hay métodos de pago disponibles</Option>
-            )}
+
+        <Form.Item name="IdMetodoPago" label="Método de Pago" rules={[{ required: true }]}>
+          <Select placeholder="Selecciona un método">
+            {metodosPago.map((m) => (
+              <Option key={m.IdMetodoPago} value={m.IdMetodoPago}>{m.NombreMetodoPago}</Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          name="IdTipoPago"
-          label="Tipo de Pago"
-          rules={[{ required: true, message: 'Por favor selecciona un tipo de pago' }]}
-        >
-          <Select placeholder="Selecciona un tipo de pago">
-            {Array.isArray(tiposPago) ? (
-              tiposPago.map((tipo) => (
-                <Option key={tipo.IdTipoPago} value={tipo.IdTipoPago}>
-                  {tipo.NombreTipoPago}
-                </Option>
-              ))
-            ) : (
-              <Option disabled>No hay tipos de pago disponibles</Option>
-            )}
+
+        <Form.Item name="IdTipoPago" label="Tipo de Pago" rules={[{ required: true }]}>
+          <Select placeholder="Selecciona un tipo">
+            {tiposPago.map((t) => (
+              <Option key={t.IdTipoPago} value={t.IdTipoPago}>{t.NombreTipoPago}</Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          name="Concepto"
-          label="Concepto"
-          rules={[{ required: true, message: 'Por favor ingresa el concepto' }]}
-        >
+
+        <Form.Item name="Concepto" label="Mes a Pagar" rules={[{ required: true, message: 'Selecciona el mes' }]}>
+          <Select placeholder="Selecciona el mes">
+            {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre'].map((mes) => (
+              <Option key={mes} value={mes}>{mes}</Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item name="Monto" label="Monto" rules={[{ required: true }]}>
+          <Input type="number" step="0.01" />
+        </Form.Item>
+
+        <Form.Item name="NumeroRecibo" label="Número de Recibo">
           <Input />
         </Form.Item>
-        <Form.Item
-          name="Monto"
-          label="Monto"
-          rules={[{ required: true, message: 'Por favor ingresa el monto' }]}
-        >
-          <Input
-            value={form.getFieldValue('Monto') || ''} // Controlado manualmente
-            onChange={(e) => form.setFieldsValue({ Monto: e.target.value })}
-            step="0.01"
-          />
+
+        {/* CAMPOS NUEVOS */}
+        <Form.Item name="NombreRecibo" label="Nombre en Recibo">
+          <Input placeholder="Ej: Juan Pérez" />
         </Form.Item>
-        <Form.Item
-          name="NumeroRecibo"
-          label="Número de Recibo"
-        >
-          <Input />
+
+        <Form.Item name="DireccionRecibo" label="Dirección en Recibo">
+          <Input placeholder="Ej: 10ma avenida 5-20, Zona 1" />
         </Form.Item>
+
         <Form.Item>
           <Button type="primary" htmlType="submit" style={{ background: '#003366', borderColor: '#003366' }}>
             Ingresar Pago
@@ -260,73 +236,63 @@ const CrearPago = () => {
         </Form.Item>
       </Form>
 
-      {/* PopUp de búsqueda de alumno */}
+      {/* MODAL DE BÚSQUEDA */}
       <Modal
         title="Buscar Alumno"
-        open={isSearchModalOpen} // Usamos open en lugar de visible
-        onOk={handleSearchModalOk}
-        onCancel={handleSearchModalOk}
+        open={isSearchModalOpen}
+        onCancel={() => setIsSearchModalOpen(false)}
         footer={[
           <Button key="search" type="primary" onClick={handleSearchAlumno} style={{ background: '#003366', borderColor: '#003366' }}>
             Buscar
           </Button>,
-          <Button key="ok" type="primary" onClick={handleSearchModalOk} style={{ background: '#003366', borderColor: '#003366' }}>
+          <Button key="close" onClick={() => setIsSearchModalOpen(false)}>
             Cerrar
           </Button>,
         ]}
-        width={1000} // Ancho de la tabla
+        width={1000}
       >
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
           <Select
             showSearch
             placeholder="Selecciona un alumno"
-            optionFilterProp="children"
+            onChange={setSelectedAlumno}
+            style={{ width: 300 }}
             filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              option.children.toLowerCase().includes(input.toLowerCase())
             }
-            onChange={(value) => setSelectedAlumno(value)}
-            style={{ width: '300px', marginRight: '16px' }}
           >
-            {Array.isArray(alumnos) ? (
-              alumnos.map((alumno) => (
-                <Option key={alumno.IdAlumno} value={alumno.IdAlumno}>
-                  {`${alumno.Nombres} ${alumno.Apellidos}`}
-                </Option>
-              ))
-            ) : (
-              <Option disabled>No hay alumnos disponibles</Option>
-            )}
+            {alumnos.map((a) => (
+              <Option key={a.IdAlumno} value={a.IdAlumno}>
+                {`${a.Nombres} ${a.Apellidos}`}
+              </Option>
+            ))}
           </Select>
           <Input
-            placeholder="Ciclo Escolar (ej. 2026)"
+            placeholder="Ciclo Escolar"
             value={cicloEscolar}
             onChange={(e) => setCicloEscolar(e.target.value)}
-            style={{ width: '200px' }}
+            style={{ width: 200 }}
           />
         </div>
+
         <Table
           columns={columns}
           dataSource={alumnoData}
-          rowKey={(record) => record[0]?.IdAlumno || Math.random()} // Usamos IdAlumno como clave
+          rowKey={(r) => r[0]?.IdAlumno}
           onRow={(record) => ({
             onDoubleClick: () => handleRowDoubleClick(record),
           })}
           pagination={false}
-          scroll={{ y: 300 }} // Altura de la tabla
+          scroll={{ y: 300 }}
         />
       </Modal>
 
-      {/* PopUp de éxito */}
+      {/* MODAL DE ÉXITO */}
       <Modal
         title="Éxito"
-        open={isSuccessModalOpen} // Usamos open en lugar de visible
-        onOk={handleSuccessModalOk}
-        onCancel={handleSuccessModalOk}
-        footer={[
-          <Button key="ok" type="primary" onClick={handleSuccessModalOk} style={{ background: '#003366', borderColor: '#003366' }}>
-            Aceptar
-          </Button>,
-        ]}
+        open={isSuccessModalOpen}
+        onOk={() => setIsSuccessModalOpen(false)}
+        onCancel={() => setIsSuccessModalOpen(false)}
       >
         <p>Pago realizado con éxito</p>
       </Modal>

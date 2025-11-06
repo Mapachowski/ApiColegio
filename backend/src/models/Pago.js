@@ -68,6 +68,14 @@ const Pago = sequelize.define('Pagos', {
     type: DataTypes.STRING(55),
     allowNull: true, // Cambia a false si debe ser obligatorio
   },
+    NombreRecibo: {
+    type: DataTypes.STRING(255),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
+    DireccionRecibo: {
+    type: DataTypes.STRING(255),
+    allowNull: true, // Cambia a false si debe ser obligatorio
+  },
 }, {
   tableName: 'Pagos',
   timestamps: false,
